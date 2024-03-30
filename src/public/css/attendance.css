@@ -1,0 +1,37 @@
+/* テーブル */
+.attendance__table {
+    margin-top: 50px;
+    width: 90%;
+    border-collapse: collapse;
+
+}
+
+.attendance__row {
+    border-top: 1px solid #777;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.attendance__label,
+.attendance__data {
+    padding: 25px 8px;
+}
+
+.attendance__label:first-of-type,
+.attendance__data:first-of-type {
+    padding-left: 48px;
+}
+
+.attendance__label:last-of-type,
+.attendance__data:last-of-type {
+    padding-right: 0px;
+}
+
+.attendance__label {
+    color: #000;
+    text-align: left;
+    font-weight: bold;
+    width: 100%;
+    gap: 24px;
+}
