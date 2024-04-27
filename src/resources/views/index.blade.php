@@ -7,6 +7,11 @@
 @section('content')
 <div class="login-form">
     <h2 class="login-form__heading content__heading">{{ $user->name }}さんお疲れ様です！</h2>
+    @if (session('status'))
+    <div class="alert">
+        {{ session('status') }}
+    </div>
+    @endif
     <div class="login-form__group">
         <div class="login-form__inner">
             <form class="login-form__form" action="/work_start" method="post">

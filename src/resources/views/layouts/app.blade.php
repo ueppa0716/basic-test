@@ -18,7 +18,7 @@
                 <ul class="header__link-ul">
                     @if (Auth::check())
                     <li class="header-link-li"><a class="header-link-a" href="/">ホーム</a></li>
-                    <li class="header-link-li"><a class="header-link-a" href="/attendance/{user_id}">日付一覧</a></li>
+                    <li class="header-link-li"><a class="header-link-a" href="/attendance">日付一覧</a></li>
                     <li class="header-link-li">
                         <form action="/logout" method="post">
                             @csrf
@@ -32,8 +32,16 @@
             </nav>
         </header>
 
+        <div class="page_top">
+            @yield('page_top')
+        </div>
+
         <div class="content">
             @yield('content')
+        </div>
+
+        <div class="page_bottom">
+            @yield('page_bottom')
         </div>
 
         <footer class="footer">

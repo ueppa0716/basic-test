@@ -22,7 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/work_end', [AttendanceManagementController::class, 'work_end']);
     Route::post('/break_start', [AttendanceManagementController::class, 'break_start']);
     Route::post('/break_end', [AttendanceManagementController::class, 'break_end']);
-    Route::get('/attendance/{id}', [AttendanceManagementController::class, 'search']);
+    Route::get('/attendance', [AttendanceManagementController::class, 'search']);
+    Route::get('/search', [AttendanceManagementController::class, 'search']);
+    // Route::post('/attendance', [AttendanceManagementController::class, 'search']);
 });
 
 // Route::get('/register', [RegisteredUserController::class, 'create']);

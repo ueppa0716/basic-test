@@ -90,10 +90,35 @@ button {
 }
 
 /* ページネーション */
+.page_top {
+    background-color: rgb(242, 242, 242);
+    padding-top: 40px;
+}
+
+.page_txt {
+    color: #000;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.page_txt--deco {
+    border: 1px solid rgb(35, 132, 207);
+    color: rgb(35, 132, 207);
+    background-color: white;
+    padding: 0px 10px 0px 10px;
+    font-size: 25px;
+}
+
+.page_bottom {
+    background-color: rgb(242, 242, 242);
+}
+
 .pagination {
     display: flex;
     justify-content: center;
     list-style: none;
+    margin: 0px auto 70px;
 }
 
 .pagination li:not(.active) {
@@ -106,7 +131,7 @@ button {
 }
 
 .pagination a {
-    color: #8B7969;
+    color: rgb(35, 132, 207);
     text-decoration: none;
 }
 
@@ -116,7 +141,11 @@ button {
 
 .active {
     padding: 4px 12px;
-    border: 1px solid #8B7969;
-    background-color: #8B7969;
-    color: #FFF;
+    border: 1px solid rgb(242, 242, 242);
+    background-color: rgb(35, 132, 207);
+    color: white;
+}
+
+li {
+    background-color: white
 }

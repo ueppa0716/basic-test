@@ -1,6 +1,6 @@
 /* テーブル */
 .attendance__table {
-    margin-top: 50px;
+    margin-top: 40px;
     width: 90%;
     border-collapse: collapse;
 
@@ -34,4 +34,45 @@
     font-weight: bold;
     width: 100%;
     gap: 24px;
+}
+
+
+.search-form__date {
+    font-weight: bold;
+    font-size: 25px;
+    text-align: center;
+    position: relative;
+    min-width: 140px;
+    border: none;
+    background-color: rgb(242, 242, 242);
+}
+
+.search-form__date::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: auto;
+    height: auto;
+    background: transparent;
+}
+
+/* .search-form__date::after { 
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid #BEB1A6;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    content: "";
+    transform: translateY(-50%);
+}*/
+
+.alert {
+    color: red;
+    text-align: center;
 }

@@ -32,3 +32,8 @@
     font-size: 30px;
     cursor: pointer;
 }
+
+.alert {
+    color: red;
+    text-align: center;
+}
