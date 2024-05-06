@@ -59,18 +59,13 @@
     background: transparent;
 }
 
-/* .search-form__date::after { 
+.search-form__btn {
     position: absolute;
-    top: 50%;
-    right: 12px;
-    width: 0;
-    height: 0;
-    border-top: 12px solid #BEB1A6;
-    border-right: 8px solid transparent;
-    border-left: 8px solid transparent;
-    content: "";
-    transform: translateY(-50%);
-}*/
+    font-size: 17px;
+    right: 30%;
+    border: 1px solid #E0DFDE;
+    color: #E0DFDE;
+}
 
 .alert {
     color: red;

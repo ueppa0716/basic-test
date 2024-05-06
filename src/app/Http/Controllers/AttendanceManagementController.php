@@ -35,23 +35,31 @@ class AttendanceManagementController extends Controller
             ['work_date' => Carbon::today()]
         );
 
-        // ユーザーの今日の勤務情報を取得する
-        $workInfo = Attendance::where('user_id', $user->id)
-            ->where('workdate_id', $workDate->id)
-            ->first();
+        // ユーザーの直近の勤務情報を取得する
+        $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
 
-        // ユーザーの今日の勤務情報がない場合は作成する
-        if (!$workInfo) {
+        if (($workInfo->work_start) && empty($workInfo->work_end)) {
+            return redirect()->back()->with('status', '今日は既に仕事を開始しています。');
+        } else {
             $workInfo = Attendance::create([
                 'user_id' => $user->id,
                 'workdate_id' => $workDate->id,
                 'work_start' => Carbon::now(),
             ]);
-        } elseif (($workInfo->work_start) && (!$workInfo->work_end)) {
-            return redirect()->back()->with('status', '今日は既に仕事を開始しています。');
-        } elseif (($workInfo->work_start) && ($workInfo->work_end)) {
-            return redirect()->back()->with('status', '今日は既に勤務終了しています。');
         }
+
+        // // ユーザーの今日の勤務情報がない場合は作成する
+        // if (!$workInfo) {
+        //     $workInfo = Attendance::create([
+        //         'user_id' => $user->id,
+        //         'workdate_id' => $workDate->id,
+        //         'work_start' => Carbon::now(),
+        //     ]);
+        // } elseif (($workInfo->work_start) && (!$workInfo->work_end)) {
+        //     return redirect()->back()->with('status', '今日は既に仕事を開始しています。');
+        //     // } elseif (($workInfo->work_start) && ($workInfo->work_end)) {
+        //     // return redirect()->back()->with('status', '今日は既に勤務終了しています。');
+        // }
 
         return redirect()->back();
     }
@@ -64,7 +72,7 @@ class AttendanceManagementController extends Controller
         $user = Auth::user();
         $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
 
-        // 
+        //
         if ($workInfo->work_end) {
             return redirect()->back()->with('status', '今日は既に勤務終了しています。');
         }
@@ -124,42 +132,42 @@ class AttendanceManagementController extends Controller
                 'total_work' => $totalWork
             ]);
 
-            // 新しいWorkdateを作成
-            $workDate = Workdate::firstOrCreate(['work_date' => $today]);
+            // // 新しいWorkdateを作成
+            // $workDate = Workdate::firstOrCreate(['work_date' => $today]);
 
-            // 新しいWorkdateでAttendanceを作成
-            $workInfo = Attendance::create([
-                'user_id' => $user->id,
-                'workdate_id' => $workDate->id,
-                'work_start' => Carbon::createFromTimeString('00:00:00'),
-                'work_end' => Carbon::now()
-            ]);
+            // // 新しいWorkdateでAttendanceを作成
+            // $workInfo = Attendance::create([
+            //     'user_id' => $user->id,
+            //     'workdate_id' => $workDate->id,
+            //     'work_start' => Carbon::createFromTimeString('00:00:00'),
+            //     // 'work_end' => Carbon::now()
+            // ]);
 
-            $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
-            $workStart = Carbon::parse($workInfo->work_start);
-            $workEnd = Carbon::now();
+            //     $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
+            //     $workStart = Carbon::parse($workInfo->work_start);
+            //     $workEnd = Carbon::now();
 
-            $diffWork = $workEnd->diff($workStart);
-            $workTime = $diffWork->format('%H:%I:%S');
+            //     $diffWork = $workEnd->diff($workStart);
+            //     $workTime = $diffWork->format('%H:%I:%S');
 
-            $workInfo->update([
-                'work_time' => $workTime,
-            ]);
+            //     $workInfo->update([
+            //         'work_time' => $workTime,
+            //     ]);
 
-            if (!empty($workInfo->total_rest)) {
-                $totalRest = Carbon::parse($workInfo->total_rest);
-            } else {
-                $totalRest = Carbon::createFromTimeString('00:00:00');
-            }
+            //     if (!empty($workInfo->total_rest)) {
+            //         $totalRest = Carbon::parse($workInfo->total_rest);
+            //     } else {
+            //         $totalRest = Carbon::createFromTimeString('00:00:00');
+            //     }
 
-            $workTime = Carbon::parse($workInfo->work_time);
+            //     $workTime = Carbon::parse($workInfo->work_time);
 
-            $diffTotal = $workTime->diff($totalRest);
-            $totalWork = $diffTotal->format('%H:%I:%S');
+            //     $diffTotal = $workTime->diff($totalRest);
+            //     $totalWork = $diffTotal->format('%H:%I:%S');
 
-            $workInfo->update([
-                'total_work' => $totalWork
-            ]);
+            //     $workInfo->update([
+            //         'total_work' => $totalWork
+            //     ]);
         }
         // 勤務開始の日付と今日の日付が同じ場合
         elseif (empty($workInfo->work_end) && ($today == $workStartDay->work_date)) {
@@ -201,8 +209,7 @@ class AttendanceManagementController extends Controller
     public function break_start(Request $request)
     {
         $user = Auth::user();
-        $attendance =
-            Attendance::where('user_id', $user->id)->latest()->first();
+        $attendance = Attendance::where('user_id', $user->id)->latest()->first();
         $breakInfo = Rest::where('attendance_id', $attendance->id)
             ->whereNotNull('break_start')
             ->whereNull('break_end')
@@ -220,9 +227,9 @@ class AttendanceManagementController extends Controller
             return redirect()->back()->with('status', '休憩中です。');
         }
 
-        if ($attendance->work_end) {
-            return redirect()->back()->with('status', '今日は既に勤務終了しています。');
-        }
+        // if ($attendance->work_end) {
+        // return redirect()->back()->with('status', '今日は既に勤務終了しています。');
+        // }
 
         if (empty($attendance->work_start)) {
             return redirect()->back()->with('status', '今日は仕事を開始していません。');
@@ -257,7 +264,7 @@ class AttendanceManagementController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         $breakStartDay = Carbon::parse($breakInfo->break_start)->format('Y-m-d');
 
-        // 休憩開始の日付と今日の日付が異なる場合 
+        // 休憩開始の日付と今日の日付が異なる場合
         if (empty($breakInfo->break_end) && ($breakStartDay != $today)) {
             // 前日のWorkdateに終業時間を設定
             $breakInfo->update(['break_end' => Carbon::createFromTimeString('23:59:59')->setDate($breakStart->year, $breakStart->month, $breakStart->day)]);
@@ -276,71 +283,71 @@ class AttendanceManagementController extends Controller
                 'total_rest' => $totalRest
             ]);
 
-            $workInfo->update(['work_end' => Carbon::createFromTimeString('23:59:59')]);
-            $workStart = Carbon::parse($workInfo->work_start);
-            $workEnd = Carbon::parse($workInfo->work_end);
+            // $workInfo->update(['work_end' => Carbon::createFromTimeString('23:59:59')]);
+            // $workStart = Carbon::parse($workInfo->work_start);
+            // $workEnd = Carbon::parse($workInfo->work_end);
 
-            $diffWork = $workEnd->diff($workStart);
-            $workTime = $diffWork->format('%H:%I:%S');
+            // $diffWork = $workEnd->diff($workStart);
+            // $workTime = $diffWork->format('%H:%I:%S');
 
-            $workInfo->update([
-                'work_time' => $workTime,
-            ]);
+            // $workInfo->update([
+            // 'work_time' => $workTime,
+            // ]);
 
-            if (!empty($workInfo->total_rest)) {
-                $totalRest = Carbon::parse($workInfo->total_rest);
-            } else {
-                $totalRest = Carbon::createFromTimeString('00:00:00');
-            }
+            // if (!empty($workInfo->total_rest)) {
+            // $totalRest = Carbon::parse($workInfo->total_rest);
+            // } else {
+            // $totalRest = Carbon::createFromTimeString('00:00:00');
+            // }
 
-            $workTime = Carbon::parse($workInfo->work_time);
+            // $workTime = Carbon::parse($workInfo->work_time);
 
-            $diffTotal = $workTime->diff($totalRest);
-            $totalWork = $diffTotal->format('%H:%I:%S');
+            // $diffTotal = $workTime->diff($totalRest);
+            // $totalWork = $diffTotal->format('%H:%I:%S');
 
-            $workInfo->update([
-                'total_work' => $totalWork
-            ]);
+            // $workInfo->update([
+            //     'total_work' => $totalWork
+            // ]);
 
-            // 新しいWorkdateを作成
-            $workDate = Workdate::firstOrCreate(['work_date' => $today]);
+            // // 新しいWorkdateを作成
+            // $workDate = Workdate::firstOrCreate(['work_date' => $today]);
 
-            // 新しいWorkdateで00:00:00から勤務開始状態に
-            $workInfo = Attendance::create([
-                'user_id' => $user->id,
-                'workdate_id' => $workDate->id,
-                'work_start' => Carbon::createFromTimeString('00:00:00'),
-            ]);
+            // // 新しいWorkdateで00:00:00から勤務開始状態に
+            // $workInfo = Attendance::create([
+            //     'user_id' => $user->id,
+            //     'workdate_id' => $workDate->id,
+            //     'work_start' => Carbon::createFromTimeString('00:00:00'),
+            // ]);
 
-            $attendance =
-                Attendance::where('user_id', $user->id)->latest()->first();
+            // $attendance =
+            //     Attendance::where('user_id', $user->id)->latest()->first();
 
-            // 新しいWorkdateで00:00:00から現在時刻まで休憩カウント
-            $breakInfo = Rest::create([
-                'attendance_id' => $attendance->id,
-                'break_start' =>
-                Carbon::createFromTimeString('00:00:00'),
-                'break_end' => Carbon::now(),
-            ]);
+            // // 新しいWorkdateで00:00:00から現在時刻まで休憩カウント
+            // $breakInfo = Rest::create([
+            //     'attendance_id' => $attendance->id,
+            //     'break_start' =>
+            //     Carbon::createFromTimeString('00:00:00'),
+            //     'break_end' => Carbon::now(),
+            // ]);
 
-            $breakTime = $diff->format('%H:%I:%S');
+            // $breakTime = $diff->format('%H:%I:%S');
 
-            $breakInfo->update([
-                'break_time' => $breakTime
-            ]);
+            // $breakInfo->update([
+            //     'break_time' => $breakTime
+            // ]);
 
-            $breakStartDay = Carbon::parse($breakInfo->break_start);
-            $totalRest = Rest::where('attendance_id', $attendance->id)
-                ->whereDate('break_start', $breakStartDay)
-                ->sum('break_time');
+            // $breakStartDay = Carbon::parse($breakInfo->break_start);
+            // $totalRest = Rest::where('attendance_id', $attendance->id)
+            //     ->whereDate('break_start', $breakStartDay)
+            //     ->sum('break_time');
 
-            $attendance->update([
-                'total_rest' => $totalRest
-            ]);
+            // $attendance->update([
+            //     'total_rest' => $totalRest
+            // ]);
 
-            return redirect()->back();
+            // return redirect()->back();
         }
-        // 休憩開始の日付と今日の日付が同じ場合 
+        // 休憩開始の日付と今日の日付が同じ場合
         elseif (empty($breakInfo->break_end) && ($breakStartDay == $today)) {
             $breakEnd = Carbon::now();
             $breakInfo->update(['break_end' => $breakEnd]);
@@ -369,51 +376,66 @@ class AttendanceManagementController extends Controller
     public function search(Request $request)
     {
         $user = Auth::user();
+        $today = Carbon::today()->format('Y-m-d');
+        $date = $request->input('date');
 
-        $workDate = Workdate::all();
-
-        // 修正内容 まずは今日の日付に紐づいた勤怠データ
-        // ボタンによって前後の日付にする
-
-        if ($request->date) {
-            $workDates = Workdate::whereDate('work_date', '=', $request->date)->get();
-            if ($workDates->isEmpty()) {
-                return redirect('/attendance')->with('status', '勤怠実績はありません。');
-            } else {
-                $workDate = $workDates->first();
-                $userInfos = Attendance::with(['workdate', 'user'])
-                    ->where('workdate_id', $workDate->id)
-                    ->paginate(5);
-                // dd($userInfos);
-                return view('attendance', compact('userInfos', 'workDate'));
-            }
-        } else {
-            return view('attendance')->with('status', '日付を選択してください。');
+        // フォームから送信された日付がない場合は、今日の日付を使用
+        if (!$date) {
+            $date = $today;
         }
 
-        // $userInfos = Workdate::with(['attendance.user'])
-        // ->paginate(1);
+        // "<"をクリックした場合、前日の日付を取得
+        if ($request->has('prev')) {
+            $date = Carbon::parse($date)->subDay()->format('Y-m-d');
+        }
 
-        // $userInfos = Attendance::with(['workdate', 'user'])
-        // ->orderBy('workdate_id', 'asc')
-        // ->paginate(5, ['*'], 'page');
+        // ">"をクリックした場合、次の日の日付を取得
+        if ($request->has('next')) {
+            $date = Carbon::parse($date)->addDay()->format('Y-m-d');
+        }
 
+        // 勤怠情報を取得
+        $workDates = Workdate::whereDate('work_date', '=', $date)->get();
 
-        // $userInfos = Attendance::with(['workdate', 'user'])
-        // ->whereIn('workdate_id', function ($query) {
-        // $query->select('workdate_id')
-        // ->from('attendances')
-        // ->groupBy('workdate_id');
-        // })
-        // ->paginate(5);
+        // 勤怠情報が見つからない場合は、リダイレクトしてメッセージを表示
+        if ($workDates->isEmpty()) {
+            return redirect('/attendance')->with('status', $date . 'に勤怠実績はありません。');
+        }
 
-        // $workDates = Workdate::with(['attendance.user'])
-        // ->paginate(1);
+        // 勤怠情報が見つかった場合は、その日付の最初の勤怠情報を使用
+        $workDate = $workDates->first();
+        $userInfos = Attendance::with(['workdate', 'user'])
+            ->where('workdate_id', $workDate->id)
+            ->paginate(5);
 
-        // $userInfos = $attendances->merge($workDates);
-
-        // $workDate->setRelation('attendance', $workDate->attendance()->paginate(5));
-
-        // return view('attendance', compact('userInfos'));
+        // ビューに日付と勤怠情報を渡して表示
+        return view('attendance', compact('userInfos', 'workDate', 'date'));
     }
+
+
+    // $userInfos = Workdate::with(['attendance.user'])
+    // ->paginate(1);
+
+    // $userInfos = Attendance::with(['workdate', 'user'])
+    // ->orderBy('workdate_id', 'asc')
+    // ->paginate(5, ['*'], 'page');
+
+
+    // $userInfos = Attendance::with(['workdate', 'user'])
+    // ->whereIn('workdate_id', function ($query) {
+    // $query->select('workdate_id')
+    // ->from('attendances')
+    // ->groupBy('workdate_id');
+    // })
+    // ->paginate(5);
+
+    // $workDates = Workdate::with(['attendance.user'])
+    // ->paginate(1);
+
+    // $userInfos = $attendances->merge($workDates);
+
+    // $workDate->setRelation('attendance', $workDate->attendance()->paginate(5));
+
+    // return view('attendance', compact('userInfos'));
+
 }
