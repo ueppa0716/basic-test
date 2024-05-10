@@ -50,8 +50,6 @@ class Daily extends Command
 
         $today = Carbon::today()->format('Y-m-d');
         $breakInfos = Rest::where('break_end', null)->get();
-        $workInfos = Attendance::where('work_end', null)->get();
-
         if ($breakInfos->isNotEmpty()) {
             foreach ($breakInfos as $breakInfo) {
                 $breakStartDay = Carbon::parse($breakInfo->break_start)->format('Y-m-d');
@@ -74,6 +72,8 @@ class Daily extends Command
             }
         }
 
+
+        $workInfos = Attendance::where('work_end', null)->get();
         if ($workInfos->isNotEmpty()) {
             foreach ($workInfos as $workInfo) {
                 $workStart = Carbon::parse($workInfo->work_start);
@@ -98,7 +98,11 @@ class Daily extends Command
             }
         }
 
-        return redirect()->back()->with('status', "日付が変わりました。本日は" . $today . 'です。');
+        $this->info("日付が変わりました。本日は {$today} です。");
+
+        return 0; // 成功を示す終了コードを返す
+
+        // return redirect()->back()->with('status', "日付が変わりました。本日は" . $today . 'です。');
 
 
         // $attendance = Attendance::where('user_id', $user->id)->latest()->first();
