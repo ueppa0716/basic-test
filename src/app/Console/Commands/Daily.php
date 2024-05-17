@@ -50,7 +50,12 @@ class Daily extends Command
 
         $today = Carbon::today()->format('Y-m-d');
         $breakInfos = Rest::where('break_end', null)->get();
-        if ($breakInfos->isNotEmpty()) {
+        $workInfos = Attendance::where('work_end', null)->get();
+
+        if ($breakInfos->isNotEmpty() && $workInfos->isNotEmpty()) {
+            $attendanceIds = $breakInfos->pluck('attendance_id');
+            $attendances = Attendance::whereIn('id', $attendanceIds)->get();
+            $breakUserIds = $attendances->pluck('user_id')->unique();
             foreach ($breakInfos as $breakInfo) {
                 $breakStartDay = Carbon::parse($breakInfo->break_start)->format('Y-m-d');
                 $breakStart = Carbon::parse($breakInfo->break_start);
@@ -70,11 +75,8 @@ class Daily extends Command
                     'total_rest' => $totalRest
                 ]);
             }
-        }
-
-
-        $workInfos = Attendance::where('work_end', null)->get();
-        if ($workInfos->isNotEmpty()) {
+            $workInfos = Attendance::where('work_end', null)->get();
+            // $users = User::whereIn('id', $userIds)->get();
             foreach ($workInfos as $workInfo) {
                 $workStart = Carbon::parse($workInfo->work_start);
                 $workInfo->update(['work_end' => Carbon::createFromTimeString('23:59:59')->setDate($workStart->year, $workStart->month, $workStart->day)]);
@@ -96,7 +98,59 @@ class Daily extends Command
                     'total_work' => $totalWork
                 ]);
             }
+            $userIds = $workInfos->pluck('user_id')->unique();
+            foreach ($userIds as $userId) {
+                $workDate = Workdate::firstOrCreate(
+                    ['work_date' => Carbon::today()]
+                );
+                $workInfo = Attendance::create([
+                    'user_id' => $userId,
+                    'workdate_id' => $workDate->id,
+                    'work_start' => Carbon::createFromTimeString('00:00:00'),
+                ]);
+            }
+            foreach ($breakUserIds as $breakUserId) {
+                $breakUser = Attendance::where('user_id', $breakUserId)->latest()->first();
+                Rest::create([
+                    'attendance_id' => $breakUser->id,
+                    'break_start' => Carbon::createFromTimeString('00:00:00'),
+                ]);
+            }
+        } elseif ($breakInfos->isEmpty() && $workInfos->isNotEmpty()) {
+            foreach ($workInfos as $workInfo) {
+                $workStart = Carbon::parse($workInfo->work_start);
+                $workInfo->update(['work_end' => Carbon::createFromTimeString('23:59:59')->setDate($workStart->year, $workStart->month, $workStart->day)]);
+                $workEnd = Carbon::parse($workInfo->work_end);
+                $diffWork = $workEnd->diff($workStart);
+                $workTime = $diffWork->format('%H:%I:%S');
+                $workInfo->update([
+                    'work_time' => $workTime,
+                ]);
+                if (!empty($workInfo->total_rest)) {
+                    $totalRest = Carbon::parse($workInfo->total_rest);
+                } else {
+                    $totalRest = Carbon::createFromTimeString('00:00:00');
+                }
+                $workTime = Carbon::parse($workInfo->work_time);
+                $diffTotal = $workTime->diff($totalRest);
+                $totalWork = $diffTotal->format('%H:%I:%S');
+                $workInfo->update([
+                    'total_work' => $totalWork
+                ]);
+            }
+            $userIds = $workInfos->pluck('user_id')->unique();
+            foreach ($userIds as $userId) {
+                $workDate = Workdate::firstOrCreate(
+                    ['work_date' => Carbon::today()]
+                );
+                $workInfo = Attendance::create([
+                    'user_id' => $userId,
+                    'workdate_id' => $workDate->id,
+                    'work_start' => Carbon::createFromTimeString('00:00:00'),
+                ]);
+            }
         }
+
 
         $this->info("日付が変わりました。本日は {$today} です。");
 

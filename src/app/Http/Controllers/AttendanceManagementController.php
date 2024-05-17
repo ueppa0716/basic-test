@@ -18,13 +18,13 @@ class AttendanceManagementController extends Controller
         $user = Auth::user();
 
         $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
-        $breakInfo = Rest::where('attendance_id', $workInfo->id)->latest()->first();
+        $breakInfo = null;
+
+        if ($workInfo) {
+            $breakInfo = Rest::where('attendance_id', $workInfo->id)->latest()->first();
+        }
 
         return view('index', compact('user', 'workInfo', 'breakInfo'));
-
-        // if ($request->has('logout')) {
-        // return redirect('/login');
-        // }
     }
 
 
@@ -419,7 +419,6 @@ class AttendanceManagementController extends Controller
         // フォームから送信された日付がない場合は、今日の日付を使用
         if (!$date) {
             $date = $today;
-            return view('attendance', compact('date'));
         }
 
         // "<"をクリックした場合、前日の日付を取得
@@ -437,7 +436,8 @@ class AttendanceManagementController extends Controller
 
         // 勤怠情報が見つからない場合は、リダイレクトしてメッセージを表示
         if ($workDates->isEmpty()) {
-            return redirect('/attendance')->with('status', $date . 'に勤怠実績はありません。');
+            return view('attendance', compact('date'));
+            // return redirect('/attendance')->with('status', $date . 'に勤怠実績はありません。');
         }
 
         // 勤怠情報が見つかった場合は、その日付の最初の勤怠情報を使用

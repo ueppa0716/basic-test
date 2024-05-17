@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceManagementController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\AuthenticatedSessionController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +29,36 @@ Route::middleware('auth')->group(function () {
     Route::get('/search', [AttendanceManagementController::class, 'search']);
     // Route::post('/attendance', [AttendanceManagementController::class, 'search']);
 });
+
+// メール認証ルート
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/test-email', function () {
+    Mail::raw('This is a test email.', function ($message) {
+        $message->to('test@example.com')
+            ->subject('Test Email');
+    });
+
+    return 'Email sent!';
+});
+
+// Route::get('/profile', function () {
+//     // 確認済みのユーザーのみがこのルートにアクセス可能
+// })->middleware('verified');
 
 // Route::get('/register', [RegisteredUserController::class, 'create']);
 // Route::post('/register', [RegisteredUserController::class, 'store']);
