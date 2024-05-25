@@ -31,6 +31,15 @@ Route::middleware('auth')->group(function () {
 });
 
 // メール認証ルート
+Route::post('/user/two-factor-authentication', function (Request $request) {
+    $user = $request->user();
+    $user->enableTwoFactorAuthentication();
+
+    return redirect()->back()->with('status', 'two-factor-authentication-enabled');
+})->middleware('auth');
+
+
+
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
@@ -56,9 +65,9 @@ Route::get('/test-email', function () {
     return 'Email sent!';
 });
 
-// Route::get('/profile', function () {
-//     // 確認済みのユーザーのみがこのルートにアクセス可能
-// })->middleware('verified');
+Route::get('/profile', function () {
+    // 確認済みのユーザーのみがこのルートにアクセス可能
+})->middleware('verified');
 
 // Route::get('/register', [RegisteredUserController::class, 'create']);
 // Route::post('/register', [RegisteredUserController::class, 'store']);

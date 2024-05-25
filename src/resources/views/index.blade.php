@@ -12,6 +12,11 @@
         {{ session('status') }}
     </div>
     @endif
+    @if (session('status') == 'two-factor-authentication-enabled')
+    <div class="mb-4 font-medium text-sm text-green-600">
+        Two factor authentication has been enabled.
+    </div>
+    @endif
     <div class="login-form__group">
         <div class="login-form__inner">
             <form class="login-form__form" action="/work_start" method="post">
