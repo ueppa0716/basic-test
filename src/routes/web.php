@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthenticatedSessionController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,8 @@ use Illuminate\Support\Facades\Mail;
 |
 */
 
-Route::middleware('auth')->group(function () {
+// 認証済みユーザーのためのルート
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [AttendanceManagementController::class, 'index']);
     Route::post('/work_start', [AttendanceManagementController::class, 'work_start']);
     Route::post('/work_end', [AttendanceManagementController::class, 'work_end']);
@@ -27,35 +29,27 @@ Route::middleware('auth')->group(function () {
     Route::post('/break_end', [AttendanceManagementController::class, 'break_end']);
     Route::get('/attendance', [AttendanceManagementController::class, 'search']);
     Route::get('/search', [AttendanceManagementController::class, 'search']);
-    // Route::post('/attendance', [AttendanceManagementController::class, 'search']);
+    Route::get('/profile', function () {
+        // 確認済みのユーザーのみがこのルートにアクセス可能
+    });
 });
 
-// メール認証ルート
-Route::post('/user/two-factor-authentication', function (Request $request) {
-    $user = $request->user();
-    $user->enableTwoFactorAuthentication();
-
-    return redirect()->back()->with('status', 'two-factor-authentication-enabled');
-})->middleware('auth');
-
-
-
+// コメントアウトされたルート（必要に応じて使用）
+/*
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-
-    return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [AuthenticatedSessionController::class, 'verify'])
+    ->middleware(['auth', 'signed'])
+    ->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
-
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+// テストメール送信ルート
 Route::get('/test-email', function () {
     Mail::raw('This is a test email.', function ($message) {
         $message->to('test@example.com')
@@ -64,12 +58,8 @@ Route::get('/test-email', function () {
 
     return 'Email sent!';
 });
-
-Route::get('/profile', function () {
-    // 確認済みのユーザーのみがこのルートにアクセス可能
-})->middleware('verified');
-
-// Route::get('/register', [RegisteredUserController::class, 'create']);
-// Route::post('/register', [RegisteredUserController::class, 'store']);
-
-// Route::get('/login', [AuthenticatedSessionController::class, 'store']);
+Auth::routes(['verify' => true]);
+Route::get('/register', [RegisteredUserController::class, 'create']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::get('/login', [AuthenticatedSessionController::class, 'store']);
+*/
