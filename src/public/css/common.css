@@ -20,6 +20,7 @@ a {
     align-items: center;
     height: 80px;
     border: 1px solid #E0DFDE;
+    padding-right: 50px;
     text-align: center;
     font-family: serif;
     font-size: 18px;
@@ -36,7 +37,7 @@ a {
 .header__link-nav {
     margin: 0 auto;
     color: black;
-    grid-column: 4;
+    grid-column: 5;
 }
 
 .header__link-ul {
@@ -50,9 +51,9 @@ a {
     margin-right: 50px;
 }
 
-.header-link-a::last-of-child {
-    margin-right: 0px;
-}
+/* .header-link-a::last-of-child {
+    margin-right: 50px;
+} */
 
 /* フッター */
 .footer {

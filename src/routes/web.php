@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+Auth::routes(['verify' => true]);
+
 // 認証済みユーザーのためのルート
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [AttendanceManagementController::class, 'index']);
@@ -29,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/break_end', [AttendanceManagementController::class, 'break_end']);
     Route::get('/attendance', [AttendanceManagementController::class, 'search']);
     Route::get('/search', [AttendanceManagementController::class, 'search']);
+    Route::get('/user', [AttendanceManagementController::class, 'user']);
     Route::get('/profile', function () {
         // 確認済みのユーザーのみがこのルートにアクセス可能
     });
@@ -58,7 +61,7 @@ Route::get('/test-email', function () {
 
     return 'Email sent!';
 });
-Auth::routes(['verify' => true]);
+
 Route::get('/register', [RegisteredUserController::class, 'create']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::get('/login', [AuthenticatedSessionController::class, 'store']);

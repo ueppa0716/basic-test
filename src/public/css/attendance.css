@@ -64,7 +64,8 @@
     font-size: 17px;
     right: 30%;
     border: 1px solid #E0DFDE;
-    color: #E0DFDE;
+    color: #000;
+    background-color: #fff;
 }
 
 .alert {

@@ -42,7 +42,7 @@ class AttendanceManagementController extends Controller
         // ユーザーの直近の勤務情報を取得する
         $workInfo = Attendance::where('user_id', $user->id)->latest()->first();
 
-        if (($workInfo->work_start) && empty($workInfo->work_end)) {
+        if ($workInfo && ($workInfo->work_start) && empty($workInfo->work_end)) {
             return redirect()->back()->with('status', '今日は既に仕事を開始しています。');
         } else {
             $workInfo = Attendance::create([
@@ -476,4 +476,11 @@ class AttendanceManagementController extends Controller
 
     // return view('attendance', compact('userInfos'));
 
+
+    public function user(Request $request)
+    {
+        $users = User::paginate(5);
+
+        return view('user', compact('users'));
+    }
 }
