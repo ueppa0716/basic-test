@@ -5,11 +5,11 @@
 @endsection
 
 @section('page_top')
-    <form class="search-form" action="/show" method="get">
+    <form class="search-form" action="/user" method="get">
         @csrf
         <p class="page_txt">
             <!-- 入力フィールド -->
-            <input class="search-form__date" type="text" name="keyword" placeholder="名前やメールアドレスを入力してください"
+            <input class="search-form__keyword" type="text" name="keyword" placeholder="名前やメールアドレスを入力してください"
                 value="{{ request('keyword') }}">
 
             <!-- 検索ボタン -->
@@ -36,7 +36,13 @@
                 <tr class="user__row">
                     <th class="user__label">{{ $user->name }}</th>
                     <th class="user__label">{{ $user->email }}</th>
-                    <th class="user__label"><a class="" href="">詳細</a></th>
+                    <th class="user__label">
+                        <form class="" action="/work" method="get">
+                            @csrf
+                            <input type="hidden" name="user_id" value="{{ $user->id }}">
+                            <input class="" type="submit" value="詳細">
+                        </form>
+                    </th>
                 </tr>
             @endforeach
         @endif

@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/attendance', [AttendanceManagementController::class, 'search']);
     Route::get('/search', [AttendanceManagementController::class, 'search']);
     Route::get('/user', [AttendanceManagementController::class, 'user']);
+    Route::get('/work', [AttendanceManagementController::class, 'work']);
     Route::get('/profile', function () {
         // 確認済みのユーザーのみがこのルートにアクセス可能
     });

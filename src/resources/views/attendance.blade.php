@@ -42,7 +42,13 @@
         @if (isset($userInfos))
             @foreach ($userInfos as $userInfo)
                 <tr class="attendance__row">
-                    <th class="attendance__label">{{ $userInfo->user->name }}</th>
+                    <th class="attendance__label">
+                        <form class="" action="/work" method="get">
+                            @csrf
+                            <input type="hidden" name="user_id" value="{{ $userInfo->user_id }}">
+                            <input class="work__btn" type="submit" value="{{ $userInfo->user->name }}">
+                        </form>
+                    </th>
                     <th class="attendance__label">{{ date('H:i:s', strtotime($userInfo->work_start)) }}</th>
                     <th class="attendance__label">
                         @if (!empty($userInfo->work_end))

@@ -36,35 +36,25 @@
     gap: 24px;
 }
 
-
-.search-form__date {
+.search-form__keyword {
     font-weight: bold;
-    font-size: 25px;
+    font-size: 20px;
     text-align: center;
     position: relative;
+    width: 35%;
     min-width: 140px;
-    border: none;
-    background-color: rgb(242, 242, 242);
-}
-
-.search-form__date::-webkit-calendar-picker-indicator {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    width: auto;
-    height: auto;
-    background: transparent;
+    border: 1px solid #E0DFDE;
+    color: #000;
+    background-color: #fff;
 }
 
 .search-form__btn {
     position: absolute;
     font-size: 17px;
-    right: 30%;
+    right: 25%;
     border: 1px solid #E0DFDE;
-    color: #E0DFDE;
+    color: #000;
+    background-color: #fff;
 }
 
 .alert {

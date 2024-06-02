@@ -481,6 +481,46 @@ class AttendanceManagementController extends Controller
     {
         $users = User::paginate(5);
 
+        if (!empty($request->keyword)) {
+            $users = User::where('name', 'like', '%' . $request->keyword . '%')
+                ->orWhere('email', 'like', '%' . $request->keyword . '%')
+                ->paginate(5);
+        }
+
         return view('user', compact('users'));
+    }
+
+    public function work(Request $request)
+    {
+        $date = Carbon::today()->format('Y-m');
+        $userId = $request->input('user_id');
+        $user = User::find($userId);
+
+        // 日付がクエリパラメータに含まれている場合、それを使用
+        if ($request->has('date')) {
+            $date = Carbon::parse($request->input('date'))->format('Y-m');
+        }
+
+        // "<"をクリックした場合、前月の日付を取得
+        if ($request->has('prev')) {
+            $date = Carbon::parse($date)->subMonth()->format('Y-m');
+        }
+
+        // ">"をクリックした場合、次月の日付を取得
+        if ($request->has('next')) {
+            $date = Carbon::parse($date)->addMonth()->format('Y-m');
+        }
+
+        // 'work_start'のY-mが$dateのY-mと等しいデータを取得
+        $workInfos = Attendance::where('user_id', $userId)
+            ->whereYear('work_start', '=', Carbon::parse($date)->year)
+            ->whereMonth('work_start', '=', Carbon::parse($date)->month)
+            ->paginate(5);
+
+        if ($workInfos->isEmpty()) {
+            return view('work', compact('date', 'user'));
+        } else {
+            return view('work', compact('date', 'user', 'workInfos'));
+        }
     }
 }
